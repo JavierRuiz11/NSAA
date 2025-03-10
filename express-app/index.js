@@ -27,7 +27,7 @@ app.get('/', a_middleware_function)
 
 
 app.get('/', (req, res) => {
-  res.send('hello world')
+  res.send('hello world!!')
 });
 
 app.get('/info', (req, res) => {
