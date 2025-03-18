@@ -10,12 +10,14 @@ const tlsServerCrt = fs.readFileSync('./tls/webserver.crt.pem');
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const cookieParser = require('cookie-parser');
 
 
 
 
 const app = express();
 app.use(logger('dev')); 
+app.use(cookieParser());
 
 passport.use('username-password', new LocalStrategy(
     {
@@ -54,6 +56,13 @@ app.post('/login',
       res.send(`Hello ${req.user.username}`)
     }
   )
+
+app.get('/logout', (req, res) => {
+    // Clear the cookie
+    res.clearCookie('connect.sid');
+    // Redirect to the login page
+    res.redirect('/login');
+  });
 
 app.use(function (err, req, res, next) {
     console.error(err.stack)
