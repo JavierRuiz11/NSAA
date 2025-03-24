@@ -5,14 +5,12 @@ const app = express()
 const port = 3000
 app.use(logger('dev'))
 
-// Middleware to detect Firefox
 const detectFirefox = (req, res, next) => {
   const userAgent = req.headers['user-agent']
   req.isFirefox = userAgent.includes('Firefox')
   next()
 }
 
-// Apply the Firefox detection middleware to all routes
 app.use(detectFirefox)
 
 app.use(function(err, req, res, next) {
