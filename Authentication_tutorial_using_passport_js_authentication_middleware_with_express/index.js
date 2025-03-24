@@ -24,6 +24,7 @@ let users = [];
 
 try {
   const data = fs.readFileSync('./users_slow.json', 'utf-8'); 
+  //const data = fs.readFileSync('./users_fast.json', 'utf-8'); 
   users = JSON.parse(data); 
   if (!Array.isArray(users)) throw new Error("Invalid JSON format: Expected an array");
 } catch (error) {
