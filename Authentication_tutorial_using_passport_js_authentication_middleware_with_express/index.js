@@ -4,6 +4,7 @@ const express = require('express');
 const logger = require('morgan');
 const https = require('https');
 const fs = require('fs');
+const { verify } = require('scrypt-mcf');
 
 const tlsServerKey = fs.readFileSync('./tls/webserver.key.pem');
 const tlsServerCrt = fs.readFileSync('./tls/webserver.crt.pem');
@@ -19,44 +20,58 @@ const app = express();
 app.use(logger('dev')); 
 app.use(cookieParser());
 
-passport.use('username-password', new LocalStrategy(
-    {
-      usernameField: 'username', 
-      passwordField: 'password', 
-      session: false 
-    },
-    function (username, password, done) {
-      if (username === 'walrus' && password === 'walrus') {
-        const user = {
-          username: 'walrus',
-          description: 'the only user that deserves to get to this server'
-        }
-        return done(null, user) 
-      }
-      return done(null, false) 
+let users = [];  
+
+try {
+  const data = fs.readFileSync('./users_slow.json', 'utf-8'); 
+  users = JSON.parse(data); 
+  if (!Array.isArray(users)) throw new Error("Invalid JSON format: Expected an array");
+} catch (error) {
+  console.error("Error loading users.json:", error.message);
+  users = []; 
+}
+
+  passport.use('username-password', new LocalStrategy(
+  {
+    usernameField: 'username',
+    passwordField: 'password',
+    session: false
+  },
+  async function (username, password, done) {
+    if (!Array.isArray(users)) {
+      console.error("Error: users is not an array!");
+      return done(null, false);
     }
-  ))
+
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      console.log("User not found:", username);
+      return done(null, false);
+    }
+
+    const isValid = await verify(password, user.password);
+    if (!isValid) {
+      console.log("Invalid password for:", username);
+      return done(null, false);
+    }
+
+    return done(null, { username: user.username });
+  }
+  ));
 
   passport.use('jwtCookie', new JwtStrategy(
     {
-      jwtFromRequest: (req) => {
-        if (req && req.cookies) { return req.cookies.jwt }
-        return null
-      },
+      jwtFromRequest: (req) => req?.cookies?.jwt || null,
       secretOrKey: jwtSecret
     },
-    function (jwtPayload, done) {
-      if (jwtPayload.sub && jwtPayload.sub === 'walrus') {
-        const user = {
-          username: jwtPayload.sub,
-          description: 'one of the users that deserve to get to this server',
-          role: jwtPayload.role ?? 'user'
-        }
-        return done(null, user)
+    (jwtPayload, done) => {
+      const user = users.find(u => u.username === jwtPayload.sub);
+      if (user) {
+        return done(null, { username: jwtPayload.sub, role: jwtPayload.role || 'user' });
       }
-      return done(null, false)
+      return done(null, false);
     }
-  ))
+  ));
   
 app.use(express.urlencoded({ extended: true })) 
 app.use(passport.initialize()) 

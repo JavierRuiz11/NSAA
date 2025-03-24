@@ -1,0 +1,14 @@
+[
+  {
+    "username": "walrus",
+    "password": "$scrypt$ln=20,r=8,p=2$S1rvgrTWvWTCWKdmiKChIg$GOGs48/vsivw/nqKdtdblG5zlNsF4zciRQlbNrbkQmiPto9Q88cAp6eJFxebH6yCAUnHumV4/6sFUBPO1kJpXA"
+  },
+  {
+    "username": "jruiz",
+    "password": "$scrypt$ln=20,r=8,p=2$pRBU37OknGibp6pI6UV6TQ$tNCnJKjZrcm9SXqq9d12cPV21c9fOd/972yGWi90td1p+iDMeJIOXNgiN7CkAuLMYLiBzigCkqJNptiB44d4Uw"
+  },
+  {
+    "username": "sruiz",
+    "password": "$scrypt$ln=20,r=8,p=2$xyiT8aAXc581NYoi0mKqgQ$zvJ6RnYO5Aa2RUNsu5WgLaY1rLsDYnEW5xvZDw/F2l5ujGlKk94oC1qPEkgstE3jVctegPvJnef5gXRlrTwHLA"
+  }
+]
