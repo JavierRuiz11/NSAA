@@ -13,13 +13,13 @@ async function createUsers() {
     { username: 'sruiz', password: 'sruiz' }
   ];
 
-  // Fast KDF setup (<1s)
+
   const fastKdfOptions = {
     derivedKeyLength: 64,
     scryptParams: { logN: 12, r: 8, p: 1 }
   };
 
-  // Slow KDF setup (>3s)
+
   const slowKdfOptions = {
     derivedKeyLength: 64,
     scryptParams: { logN: 20, r: 8, p: 2 }
@@ -35,7 +35,7 @@ async function createUsers() {
     return { username: user.username, password: hashedPassword};
   }));
 
-  // Save to JSON file
+
   fs.writeFileSync('users_fast.json', JSON.stringify(fastHashedUsers, null, 2));
   console.log('Fast credentials created and saved to users_fast.json');
   fs.writeFileSync('users_slow.json', JSON.stringify(slowHashedUsers, null, 2));
