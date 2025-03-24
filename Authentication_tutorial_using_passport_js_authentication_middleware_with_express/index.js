@@ -40,13 +40,13 @@ try {
   },
   async function (username, password, done) {
     if (!Array.isArray(users)) {
-      console.error("Error: users is not an array!");
+      console.error("!!Error: users is not an array!!");
       return done(null, false);
     }
 
     const user = users.find(u => u.username === username);
     if (!user) {
-      console.log("User not found:", username);
+      console.log("User not found!:", username);
       return done(null, false);
     }
 
@@ -109,8 +109,8 @@ app.post('/login',
       res.cookie('jwt', token, { httpOnly: true, secure: true }) 
       res.redirect('/')
   
-      console.log(`Token sent. Debug at https://jwt.io/?value=${token}`)
-      console.log(`Token secret (for verifying the signature): ${jwtSecret.toString('base64')}`)
+      //console.log(`Token sent. Debug at https://jwt.io/?value=${token}`)
+      //console.log(`Token secret (for verifying the signature): ${jwtSecret.toString('base64')}`)
     }
   )
 
