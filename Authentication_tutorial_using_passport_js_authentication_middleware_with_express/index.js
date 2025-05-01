@@ -81,11 +81,11 @@ try {
     ));
 
   passport.serializeUser((user, done) => {
-      done(null, user); // Serializa el objeto de perfil completo
+      done(null, user); 
     });
     
   passport.deserializeUser((user, done) => {
-      done(null, user); // Devuelve el usuario completo en la sesión
+      done(null, user); 
     });
     
 
@@ -96,7 +96,6 @@ try {
         secretOrKey: jwtSecret
       },
       (jwtPayload, done) => {
-        // Acepta cualquier usuario con JWT válido
         return done(null, { username: jwtPayload.sub, role: jwtPayload.role || 'user' });
       }
     ));
