@@ -24,7 +24,7 @@ app.use(cookieParser());
 let users = [];  
 
 app.use(session({
-  secret: 'your_secret_key',
+  secret: require('crypto').randomBytes(32).toString('base64url'),
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true }  
