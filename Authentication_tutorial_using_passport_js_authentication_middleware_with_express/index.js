@@ -77,7 +77,7 @@ async function main() {
   app.get('/oidc/cb',
     passport.authenticate('oidc', { failureRedirect: '/login', session: false }),
     (req, res) => {
-      //console.log(req.user)
+      console.log("openid user: ", req.user)
       const jwtClaims = {
         sub: req.user.email,
         iss: 'localhost:3000',
@@ -165,7 +165,7 @@ async function main() {
         { session: false, failureRedirect: '/login' }
       ),
       (req, res) => {
-        console.log(req)
+        //console.log(req)
         res.send(`Welcome to your private page, ${req.user.username}!`) 
       }
     )
@@ -177,7 +177,7 @@ async function main() {
   app.get('/auth/google/callback', 
       passport.authenticate('google', { failureRedirect: '/login' , session: false }),
       function (req, res) {
-        console.log(req.user)
+        console.log("oauth2.0 user: ", req.user)
         const jwtClaims = {
           sub: req.user.displayName,
           iss: 'localhost:3000',
@@ -187,7 +187,7 @@ async function main() {
         }
   
         const token = jwt.sign(jwtClaims, jwtSecret)
-        console.log(token)
+        //console.log(token)
         res.cookie('jwt', token, { httpOnly: true, secure: true }) 
         res.redirect('/');
 
