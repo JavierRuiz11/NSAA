@@ -71,7 +71,7 @@ async function main() {
   ));
   
   app.get('/oidc/login',
-    passport.authenticate('oidc', { scope: 'openid email' })
+    passport.authenticate('oidc', { scope: 'openid email', prompt: 'select_account' })
   )
 
   app.get('/oidc/cb',
