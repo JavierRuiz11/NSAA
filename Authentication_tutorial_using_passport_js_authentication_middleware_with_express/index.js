@@ -156,7 +156,7 @@ async function main() {
   app.get('/auth/google', (req, res, next) => {
     console.log("Google Auth route accessed");
     next(); 
-  }, passport.authenticate('google', { scope: ['profile', 'email'] }));
+  }, passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account'}));
 
 
   app.get('/',
