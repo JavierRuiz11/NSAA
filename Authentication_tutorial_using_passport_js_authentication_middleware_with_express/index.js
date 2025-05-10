@@ -16,7 +16,15 @@ const jwtSecret = require('crypto').randomBytes(16)
 const JwtStrategy = require('passport-jwt').Strategy
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { Issuer, Strategy: OpenIDConnectStrategy } = require('openid-client');
-
+const Client = require('node-radius-client');
+const {
+  dictionaries: {
+    rfc2865: {
+      file : rfc2865file,
+      attributes:rfc2865attrs,
+    },
+  },
+} = require('node-radius-utils');
 
 async function main() {
   const app = express();
@@ -43,6 +51,41 @@ async function main() {
     users = []; 
   }
   
+  passport.use('local-radius',new LocalStrategy(
+    {
+      usernameField: 'username',
+      passwordField: 'password',
+      session: false
+    },
+    async (username, password, done) => {
+      try {
+        const radiusClient = new Client({
+          host: process.env.RADIUS_SERVER_HOST,
+          dictionaries: [
+            rfc2865file,
+          ],
+        });
+  
+        const response = await radiusClient.accessRequest({
+          secret: process.env.RADIUS_SERVER_SECRET,
+          attributes: [
+            [rfc2865attrs.USER_NAME, username],
+            [rfc2865attrs.USER_PASSWORD, password]
+          ]
+          
+        });
+  
+        if (response.code === 'Access-Accept') {
+          return done(null, { username });
+        }
+        return done(null, false);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  ));
+
+
   const issuer = await Issuer.discover(process.env.OIDC_PROVIDER);
   const client = new issuer.Client({
     client_id: process.env.OIDC_CLIENT_ID,
@@ -214,7 +257,23 @@ async function main() {
         //console.log(`Token secret (for verifying the signature): ${jwtSecret.toString('base64')}`)
       }
     )
+  app.post('/login/radius',
+  passport.authenticate('local-radius', { failureRedirect: '/login', session: false }),
+  (req, res) => {
+    console.log("radius user: ", req.user)
+    const jwtClaims = {
+      sub: req.user.username,
+      iss: 'localhost:3000',
+      aud: 'localhost:3000',
+      exp: Math.floor(Date.now() / 1000) + 604800,
+      role: 'user'
+    };
 
+    const token = jwt.sign(jwtClaims, jwtSecret);
+    res.cookie('jwt', token, { httpOnly: true, secure: true });
+    res.redirect('/');
+  }
+);
 
   app.get('/logout', (req, res) => {
       res.clearCookie('jwt');
